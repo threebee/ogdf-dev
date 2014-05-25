@@ -54,7 +54,7 @@ void ChungLu(Graph &G, int n, Array<double> &weights) {
 
 }
 
-//! Creates a ChungLu Graph. 
+//! Creates a ChungLu Graph with random weights. 
 /**
 * @param G is assigned the generated graph.
 * @param n is the number of nodes of the generated graph.
