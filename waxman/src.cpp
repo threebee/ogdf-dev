@@ -60,9 +60,8 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 		G.newNode();
 
 	// setting random points in the plane
-	for (node v : G.nodes) {
+	for (node v : G.nodes)
 		point[v] = DPoint(dist(rng), dist(rng));
-	}
 
 	double maxDistance = 0.0;
 
@@ -81,9 +80,8 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability){
+			if (dist(rng) <= probability)
 				G.newEdge(v, w);
-			}
 		}
 	}
 
@@ -137,9 +135,8 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability) {
+			if (dist(rng) <= probability)
 				G.newEdge(v, w);
-			}
 		}
 	}
 
@@ -175,9 +172,8 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability) {
+			if (dist(rng) <= probability)
 				G.newEdge(v, w);
-			}
 		}
 	}
 
@@ -211,9 +207,8 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, doubl
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability) {
+			if (dist(rng) <= probability)
 				G.newEdge(v, w);
-			}
 		}
 	}
 
