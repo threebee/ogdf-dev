@@ -27,63 +27,58 @@
 #include <cmath>
 #include <random>
 
-#include <ogdf/basic/Graph.h> 
+#include <ogdf/basic/Graph.h>
 #include <ogdf/basic/NodeArray.h>
 #include <ogdf/basic/geometry.h>
 
-using std::cout;
 using std::minstd_rand;
 using std::uniform_int_distribution;
 using std::uniform_real_distribution;
 using namespace ogdf;
 
-//! Creates a Waxman graph[Model-1] by laying out nodes in a unit square. 
+//! Creates a Waxman graph[Model-1] by laying out nodes in a unit square.
 /**
-* @param G is assigned the generated graph.
-* @param n is the number of nodes of the generated graph.
-* @param alpha is a parameter in the range(0, 1].
-* @param beta is a parameter in the range(0, 1].
-*/
+ * @param G is assigned the generated graph.
+ * @param n is the number of nodes of the generated graph.
+ * @param alpha is a parameter in the range(0, 1].
+ * @param beta is a parameter in the range(0, 1].
+ */
 void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
-	if ((std::abs(alpha - 0.0) < std::numeric_limits<double>::epsilon()) 
-		|| (std::abs(beta - 0.0) < std::numeric_limits<double>::epsilon())) {
-		return;
-	}
-	if (alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0){
-		return;
-	}
-	
+	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
+	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
+
 	G.clear();
 	if (n == 0) return;
 
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, 1);
 
-	Array<node> v(n);
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
-	for (int i = 0; i < n; i++) {
-		v[i] = G.newNode();
-		point[v[i]] = DPoint(dist(rng), dist(rng));
+	// setting random points in the plane
+	for (node v : G.nodes) {
+		point[v] = DPoint(dist(rng), dist(rng));
 	}
 
-	double L = 0.0;
+	double maxDistance = 0.0;
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double tmp = point[v[i]].distance(point[v[j]]);
-			if (tmp > L)
-				L = tmp;
+	// obtaining maximum distance between points
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) {
+			double distance = point[v].distance(point[w]);
+			if (distance > maxDistance)
+				maxDistance = distance;
 		}
 	}
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double d = point[v[i]].distance(point[v[j]]);
-			double p = alpha*exp(-d / (beta*L));
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) {
+			double distance = point[v].distance(point[w]);
+			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			if (dist(rng) <= p){
-				G.newEdge(v[i], v[j]);
+			// connecting edges based on probability
+			if (dist(rng) <= probability){
+				G.newEdge(v, w);
 			}
 		}
 	}
@@ -92,21 +87,16 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 
 //! Creates a Waxman graph[Model-1] by laying out nodes in a user specified grid.
 /**
-* @param G is assigned the generated graph.
-* @param n is the number of nodes of the generated graph.
-* @param alpha is a parameter in the range(0, 1].
-* @param beta is a parameter in the range(0, 1].
-* @param width is the width of the grid.
-* @param height is the height of the grid.
-*/
-void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int height, int width) {
-	if ((std::abs(alpha - 0.0) < std::numeric_limits<double>::epsilon())
-		|| (std::abs(beta - 0.0) < std::numeric_limits<double>::epsilon())) {
-		return;
-	}
-	if (alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0){
-		return;
-	}
+ * @param G is assigned the generated graph.
+ * @param n is the number of nodes of the generated graph.
+ * @param alpha is a parameter in the range(0, 1].
+ * @param beta is a parameter in the range(0, 1].
+ * @param width is the width of the grid.
+ * @param height is the height of the grid.
+ */
+void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int width, int height) {
+	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
+	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
 	G.clear();
 	if (n == 0) return;
@@ -115,114 +105,98 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 	uniform_real_distribution<> dist(0, 1);
 	uniform_int_distribution<> distx(0, width);
 	uniform_int_distribution<> disty(0, height);
-	Array<node> v(n);
+
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
-	for (int i = 0; i < n; i++){
-		v[i] = G.newNode();
-		point[v[i]] = DPoint(distx(rng), disty(rng));
-	}
+	// setting random points in the width*height grid.
+	for (node v : G.nodes)
+		point[v] = DPoint(distx(rng), disty(rng));
 
-	double L = 0.0;
+	double maxDistance = 0.0;
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double tmp = point[v[i]].distance(point[v[j]]);
-			if (tmp > L)
-				L = tmp;
+	// obtaining maximum distance between points
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) {
+			double distance = point[v].distance(point[w]);
+			if (distance > maxDistance)
+				maxDistance = distance;
 		}
 	}
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double d = point[v[i]].distance(point[v[j]]);
-			double p = alpha*exp(-d / (beta*L));
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) {
+			double distance = point[v].distance(point[w]);
+			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			if (dist(rng) <= p) {
-				G.newEdge(v[i], v[j]);
+			// connecting edges based on probability
+			if (dist(rng) <= probability) {
+				G.newEdge(v, w);
 			}
 		}
 	}
 
 }
 
-//! Creates a Waxman graph[Model-2] with randomly selected L.
+//! Creates a Waxman graph[Model-2] with randomly selected maxDistance.
 /**
-* @param G is assigned the generated graph.
-* @param n is the number of nodes of the generated graph.
-* @param alpha is a parameter in the range(0, 1].
-* @param beta is a parameter in the range(0, 1].
-*/
+ * @param G is assigned the generated graph.
+ * @param n is the number of nodes of the generated graph.
+ * @param alpha is a parameter in the range(0, 1].
+ * @param beta is a parameter in the range(0, 1].
+ */
 void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
-	if ((std::abs(alpha - 0.0) < std::numeric_limits<double>::epsilon())
-		|| (std::abs(beta - 0.0) < std::numeric_limits<double>::epsilon())) {
-		return;
-	}
-	if (alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0){
-		return;
-	}
+	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
+	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
 	G.clear();
 	if (n == 0) return;
 
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, 1);
-	Array<node> v(n);
 
-	for (int i = 0; i < n; i++) {
-		v[i] = G.newNode();
-	}
+	// randomly selecting maxDistance
+	double maxDistance = dist(rng);
 
-	double L = dist(rng);
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) {
+			double distance = dist(rng) * maxDistance;
+			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double d = dist(rng)*L;
-			double p = alpha*exp(-d / (beta*L));
-
-			if (dist(rng) <= p) {
-				G.newEdge(v[i], v[j]);
+			// connecting edges based on probability
+			if (dist(rng) <= probability) {
+				G.newEdge(v, w);
 			}
 		}
 	}
 
 }
 
-//! Creates a Waxman graph[Model-2] with user specified L.
+//! Creates a Waxman graph[Model-2] with user specified maxDistance.
 /**
-* @param G is assigned the generated graph.
-* @param n is the number of nodes of the generated graph.
-* @param alpha is a parameter in the range(0, 1].
-* @param beta is a parameter in the range(0, 1].
-* @param L is the maximum distance between two nodes.
-*/
-void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, double L) {
-	if ((std::abs(alpha - 0.0) < std::numeric_limits<double>::epsilon())
-		|| (std::abs(beta - 0.0) < std::numeric_limits<double>::epsilon())) {
-		return;
-	}
-	if (alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0){
-		return;
-	}
+ * @param G is assigned the generated graph.
+ * @param n is the number of nodes of the generated graph.
+ * @param alpha is a parameter in the range(0, 1].
+ * @param beta is a parameter in the range(0, 1].
+ * @param maxDistance is the maximum distance between two nodes.
+ */
+void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, double maxDistance) {
+	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
+	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
 	G.clear();
 	if (n == 0) return;
 
 	minstd_rand rng(randomSeed());
-	uniform_real_distribution<> dist(0, L);
-	Array<node> v(n);
+	uniform_real_distribution<> dist(0, maxDistance);
 
-	for (int i = 0; i < n; i++) {
-		v[i] = G.newNode();
-	}
+	for (node v : G.nodes) {
+		for (node w = v->succ(); w; w = w->succ()) { 
+			double distance = dist(rng);
+			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-	for (int i = 0; i < n; i++) {
-		for (int j = i + 1; j < n; j++) {
-			double d = dist(rng)*L;
-			double p = alpha*exp(-d / (beta*L));
-
-			if (dist(rng) <= p) {
-				G.newEdge(v[i], v[j]);
+			// connecting edges based on probability
+			if (dist(rng) <= probability) {
+				G.newEdge(v, w);
 			}
 		}
 	}
@@ -236,7 +210,6 @@ int main(){
 	randomWaxmanGraphUsingGrid(G, 100, 0.5, 0.5, 10, 10);
 	randomWaxmanGraph(G, 100, 0.5, 0.5);
 	randomWaxmanGraphIntegral(G, 100, 0.5, 0.5, 10);
-
 
 	return 0;
 }
