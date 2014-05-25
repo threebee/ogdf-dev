@@ -55,6 +55,10 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
+	// adding n nodes to graph
+	for (int i = 0; i < n; i++)
+		G.newNode();
+
 	// setting random points in the plane
 	for (node v : G.nodes) {
 		point[v] = DPoint(dist(rng), dist(rng));
@@ -76,7 +80,7 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 			double distance = point[v].distance(point[w]);
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			// connecting edges based on probability
+			// connecting nodes based on probability
 			if (dist(rng) <= probability){
 				G.newEdge(v, w);
 			}
@@ -108,6 +112,10 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
+	// adding n nodes to graph
+	for (int i = 0; i < n; i++)
+		G.newNode();
+
 	// setting random points in the width*height grid.
 	for (node v : G.nodes)
 		point[v] = DPoint(distx(rng), disty(rng));
@@ -128,7 +136,7 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 			double distance = point[v].distance(point[w]);
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			// connecting edges based on probability
+			// connecting nodes based on probability
 			if (dist(rng) <= probability) {
 				G.newEdge(v, w);
 			}
@@ -154,6 +162,10 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, 1);
 
+	// adding n nodes to graph
+	for (int i = 0; i < n; i++)
+		G.newNode();
+
 	// randomly selecting maxDistance
 	double maxDistance = dist(rng);
 
@@ -162,7 +174,7 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
 			double distance = dist(rng) * maxDistance;
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			// connecting edges based on probability
+			// connecting nodes based on probability
 			if (dist(rng) <= probability) {
 				G.newEdge(v, w);
 			}
@@ -189,12 +201,16 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, doubl
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, maxDistance);
 
+	// adding n nodes to graph
+	for (int i = 0; i < n; i++)
+		G.newNode();
+
 	for (node v : G.nodes) {
-		for (node w = v->succ(); w; w = w->succ()) { 
+		for (node w = v->succ(); w; w = w->succ()) {
 			double distance = dist(rng);
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
-			// connecting edges based on probability
+			// connecting nodes based on probability
 			if (dist(rng) <= probability) {
 				G.newEdge(v, w);
 			}
