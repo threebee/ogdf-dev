@@ -142,7 +142,7 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 
 }
 
-//! Creates a Waxman graph[Model-2] with randomly selected maxDistance.
+//! Creates a Waxman graph[Model-2].
 /**
  * @param G is assigned the generated graph.
  * @param n is the number of nodes of the generated graph.
@@ -163,13 +163,9 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
 	for (int i = 0; i < n; i++)
 		G.newNode();
 
-	// randomly selecting maxDistance
-	double maxDistance = dist(rng);
-
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
-			double distance = dist(rng) * maxDistance;
-			double probability = alpha * exp(-distance / (beta * maxDistance));
+			double probability = alpha * exp(-dist(rng) / beta);
 
 			// connecting nodes based on probability
 			if (dist(rng) <= probability)
@@ -187,7 +183,7 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
  * @param beta is a parameter in the range(0, 1].
  * @param maxDistance is the maximum distance between two nodes.
  */
-void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, double maxDistance) {
+void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, int maxDistance) {
 	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
 	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
@@ -195,7 +191,8 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, doubl
 	if (n == 0) return;
 
 	minstd_rand rng(randomSeed());
-	uniform_real_distribution<> dist(0, maxDistance);
+	// Distance between nodes is integral.
+	uniform_int_distribution<> dist(0, maxDistance);
 
 	// adding n nodes to graph
 	for (int i = 0; i < n; i++)
@@ -203,7 +200,7 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, doubl
 
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
-			double distance = dist(rng);
+			int distance = dist(rng);
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
