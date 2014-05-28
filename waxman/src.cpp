@@ -56,12 +56,14 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
 	// adding n nodes to graph
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++) {
 		G.newNode();
+	}
 
 	// setting random points in the plane
-	for (node v : G.nodes)
+	for (node v : G.nodes) {
 		point[v] = DPoint(dist(rng), dist(rng));
+	}
 
 	double maxDistance = 0.0;
 
@@ -69,8 +71,9 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
 			double distance = point[v].distance(point[w]);
-			if (distance > maxDistance)
+			if (distance > maxDistance) {
 				maxDistance = distance;
+			}
 		}
 	}
 
@@ -80,8 +83,9 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability)
+			if (dist(rng) < (probability + std::numeric_limits<double>::epsilon())) {
 				G.newEdge(v, w);
+			}
 		}
 	}
 
@@ -111,12 +115,14 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 	NodeArray<DPoint> point(G, DPoint(0, 0));
 
 	// adding n nodes to graph
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++) {
 		G.newNode();
+	}
 
 	// setting random points in the width*height grid.
-	for (node v : G.nodes)
+	for (node v : G.nodes) {
 		point[v] = DPoint(distx(rng), disty(rng));
+	}
 
 	double maxDistance = 0.0;
 
@@ -124,8 +130,9 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
 			double distance = point[v].distance(point[w]);
-			if (distance > maxDistance)
+			if (distance > maxDistance) {
 				maxDistance = distance;
+			}
 		}
 	}
 
@@ -135,8 +142,9 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability)
+			if (dist(rng) < (probability + std::numeric_limits<double>::epsilon())) {
 				G.newEdge(v, w);
+			}
 		}
 	}
 
@@ -160,16 +168,18 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
 	uniform_real_distribution<> dist(0, 1);
 
 	// adding n nodes to graph
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++) {
 		G.newNode();
+	}
 
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
 			double probability = alpha * exp(-dist(rng) / beta);
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability)
+			if (dist(rng) < (probability + std::numeric_limits<double>::epsilon())) {
 				G.newEdge(v, w);
+			}
 		}
 	}
 
@@ -195,8 +205,9 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, int m
 	uniform_int_distribution<> dist(0, maxDistance);
 
 	// adding n nodes to graph
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++) {
 		G.newNode();
+	}
 
 	for (node v : G.nodes) {
 		for (node w = v->succ(); w; w = w->succ()) {
@@ -204,8 +215,9 @@ void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, int m
 			double probability = alpha * exp(-distance / (beta * maxDistance));
 
 			// connecting nodes based on probability
-			if (dist(rng) <= probability)
+			if (dist(rng) < (probability + std::numeric_limits<double>::epsilon())) {
 				G.newEdge(v, w);
+			}
 		}
 	}
 
