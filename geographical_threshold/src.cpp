@@ -27,18 +27,20 @@ using namespace ogdf;
  * @param n is the number of nodes of the generated graph.
  * @param alpha is the model parameter.
  * @param theta is the threshold parameter.
+ * @param lambda is the exponential distribution
  * @param dimension is the dimension of nodes to layed out.
  */
-void randomGeographicalThresholdGraph(Graph &G, int n, double alpha, double theta, int dimension=2) {
-	OGDF_ASSERT(n >= 0 && alpha > 0 && theta > 0);
-
+void randomGeographicalThresholdGraph(Graph &G, int n, double alpha, double theta, double lambda = 1.0, int dimension = 2) {
+	OGDF_ASSERT(n >= 0);
+	OGDF_ASSERT(alpha > 0 && theta > 0 && lambda > 0);
+	
 	G.clear();
 	if (n == 0) return;
 
 	// exponential generator for laying out points
 	default_random_engine generator;
-	exponential_distribution<double> distribution(1.0);
-	
+	exponential_distribution<double> distribution(lambda);
+
 	// uniform generator for assigning weights
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, 1);
@@ -71,7 +73,67 @@ void randomGeographicalThresholdGraph(Graph &G, int n, double alpha, double thet
 			}
 			distance = sqrt(distance);
 
-			if ((weight(v) + weight(w)) > (theta*pow(distance,alpha))) {
+			if ((weight(v) + weight(w)) > (theta*pow(distance, alpha))) {
+				G.newEdge(v, w);
+			}
+		}
+	}
+
+}
+
+
+//! Creates a Geographical Threshold Graph with given weights. 
+/**
+ * @param G is assigned the generated graph.
+ * @param weights is array of weight assigned to nodes.
+ * @param alpha is the model parameter.
+ * @param theta is the threshold parameter.
+ * @param lambda is the exponential distribution
+ * @param dimension is the dimension of nodes to layed out.
+ */
+void randomGeographicalThresholdWeightsGraph(Graph &G, Array<int> &weights, double alpha, double theta, double lambda = 1.0, int dimension = 2) {
+	OGDF_ASSERT(alpha > 0 && theta > 0 && lambda > 0);
+
+	G.clear();
+	if (weights.size() == 0) return;
+
+	// exponential generator for laying out points
+	default_random_engine generator;
+	exponential_distribution<double> distribution(lambda);
+
+	// uniform generator for assigning weights
+	minstd_rand rng(randomSeed());
+	uniform_real_distribution<> dist(0, 1);
+
+	NodeArray<Array<double>> cord(G, Array<double>(dimension));
+	double maxWeight = 0.0;
+
+	// adding n nodes to graph and calculating max weight
+	for (int i = 0; i < weights.size(); i++) {
+		G.newNode();
+		if (maxWeight > weights[i]) {
+			maxWeight = weights[i];
+		}
+	}
+
+	// using exponential distribution to generate random points
+	for (node v : G.nodes) {
+		for (int i = 0; i < dimension; i++){
+			cord[v][i] = distribution(generator);
+		}
+	}
+
+	int i, j;
+	node v, w;
+	for (i = 0, v = G.firstNode(); v; v = v->succ(), i++) {
+		for (j = i + 1, w = v->succ(); w; w = w->succ(), j++) {
+			double distance = 0.0;
+			for (int k = 0; k < dimension; k++) {
+				distance += (cord[v][k] - cord[w][k])*(cord[v][k] - cord[w][k]);
+			}
+			distance = sqrt(distance);
+
+			if ((weights[i]/maxWeight + weights[j]/maxWeight) > theta*pow(distance, alpha)) {
 				G.newEdge(v, w);
 			}
 		}
@@ -81,10 +143,16 @@ void randomGeographicalThresholdGraph(Graph &G, int n, double alpha, double thet
 
 int main(){
 	//! TODO: tests
-	//! TODO: user specified weights version of geographicalThresholdGraph
 	Graph G;
-	randomGeographicalThresholdGraph(G, 100, 2, 2, 4);
-	std::cout << G.numberOfEdges() << endl;
+	randomGeographicalThresholdGraph(G, 10, 2, 2, 4);
+
+	Array<int> weights(0, 4);
+	for (int &x : weights) {
+		x = 4;
+	}
+
+	G.clear();
+	randomGeographicalThresholdWeightsGraph(G, weights, 2, 2, 4);
 
 	return 0;
 }

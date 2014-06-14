@@ -46,7 +46,7 @@ void norrosReittuGraph(Graph &G, Array<int> &weights) {
 	int i, j;
 	node v, w;
 	for (i = 0, v = G.firstNode(); v; v = v->succ(), i++) {
-		for (j = 0, w = v->succ(); w; w = w->succ(), j++) {
+		for (j = i + 1, w = v->succ(); w; w = w->succ(), j++) {
 			double probability = 1.0 - exp(-(weights[i] * weights[j]) / (double)Wk);
 			if (dist(rng) < (probability + std::numeric_limits<double>::epsilon())) {
 				G.newEdge(v, w);
