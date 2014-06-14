@@ -21,7 +21,7 @@ using std::uniform_int_distribution;
 using std::uniform_real_distribution;
 using namespace ogdf;
 
-//! Creates a Norros-Reittu Graph. 
+//! Creates a Geographical Threshold Graph. 
 /**
  * @param G is assigned the generated graph.
  * @param n is the number of nodes of the generated graph.
@@ -29,7 +29,9 @@ using namespace ogdf;
  * @param theta is the threshold parameter.
  * @param dimension is the dimension of nodes to layed out.
  */
-void geographicalThresholdGraph(Graph &G, int n, double alpha, double theta, int dimension=2) {
+void randomGeographicalThresholdGraph(Graph &G, int n, double alpha, double theta, int dimension=2) {
+	OGDF_ASSERT(n >= 0 && alpha > 0 && theta > 0);
+
 	G.clear();
 	if (n == 0) return;
 
@@ -81,7 +83,7 @@ int main(){
 	//! TODO: tests
 	//! TODO: user specified weights version of geographicalThresholdGraph
 	Graph G;
-	geographicalThresholdGraph(G, 100, 2, 2, 4);
+	randomGeographicalThresholdGraph(G, 100, 2, 2, 4);
 	std::cout << G.numberOfEdges() << endl;
 
 	return 0;

@@ -29,12 +29,11 @@ using namespace ogdf;
 //! Creates a ChungLu Graph.
 /**
  * @param G is assigned the generated graph.
- * @param n is the number of nodes of the generated graph.
  * @param weights is degree sequence of Graph.
  */
-void chungLuGraph(Graph &G, int n, Array<int> &weights) {
+void randomChungLuGraph(Graph &G, Array<int> &weights) {
 	G.clear();
-	if (n == 0) return;
+	if (weights.size() == 0) return;
 
 	minstd_rand rng(randomSeed());
 	uniform_real_distribution<> dist(0, 1);
@@ -42,7 +41,7 @@ void chungLuGraph(Graph &G, int n, Array<int> &weights) {
 	int Wk = 0;
 
 	// adding n nodes to graph and summing degree sequence
-	for (int i = 0; i < n; i++){
+	for (int i = 0; i < weights.size(); i++){
 		G.newNode();
 		Wk += weights[i];
 	}
@@ -65,7 +64,9 @@ void chungLuGraph(Graph &G, int n, Array<int> &weights) {
  * @param G is assigned the generated graph.
  * @param n is the number of nodes of the generated graph.
  */
-void chungLuRandomWeightsGraph(Graph &G, int n) {
+void randomChungLuRandomWeightsGraph(Graph &G, int n) {
+	OGDF_ASSERT(n >= 0);
+
 	G.clear();
 	if (n == 0) return;
 
@@ -101,14 +102,14 @@ void chungLuRandomWeightsGraph(Graph &G, int n) {
 int main(){
 	//! TODO: tests
 	Graph G;
-	chungLuRandomWeightsGraph(G, 100);
+	randomChungLuRandomWeightsGraph(G, 100);
 
 	Array<int> weights(0, 10);
 	for (int &x : weights) {
 		x = 4;
 	}
 
-	chungLuGraph(G, 10, weights);
+	randomChungLuGraph(G, weights);
 
 	return 0;
 }

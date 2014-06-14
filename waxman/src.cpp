@@ -44,6 +44,7 @@ using namespace ogdf;
  * @param beta is a parameter in the range(0, 1].
  */
 void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
+	OGDF_ASSERT(n >= 0);
 	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
 	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
@@ -101,6 +102,7 @@ void randomWaxmanGraphUsingPlane(Graph &G, int n, double alpha, double beta) {
  * @param height is the height of the grid.
  */
 void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int width, int height) {
+	OGDF_ASSERT(n >= 0 && width >= 0 && height >= 0);
 	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
 	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
@@ -158,6 +160,7 @@ void randomWaxmanGraphUsingGrid(Graph &G, int n, double alpha, double beta, int 
  * @param beta is a parameter in the range(0, 1].
  */
 void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
+	OGDF_ASSERT(n >= 0);
 	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
 	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
@@ -194,6 +197,7 @@ void randomWaxmanGraph(Graph &G, int n, double alpha, double beta) {
  * @param maxDistance is the maximum distance between two nodes.
  */
 void randomWaxmanGraphIntegral(Graph &G, int n, double alpha, double beta, int maxDistance) {
+	OGDF_ASSERT(n >= 0 && maxDistance >= 0)
 	OGDF_ASSERT(alpha > 0.0 && (alpha < (1.0 + std::numeric_limits<double>::epsilon())));
 	OGDF_ASSERT(beta > 0.0 && (beta < (1.0 + std::numeric_limits<double>::epsilon())));
 
