@@ -2,6 +2,8 @@
  * On a conditionally Poissonean graph process
  * Link: http://citeseerx.ist.psu.edu/showciting?cid=233780  
  *
+ * Link: https://www.mittag-leffler.se/preprints/files/IML-0405f-17.pdf
+ *
  * Norros-Reittu graph
  * Consider Graph G (n, W) with n vertices and degree sequence W = (W1, W2, ..., Wn) >= 0
  * In this model, an edge between two vertices i and j is independently present with probability

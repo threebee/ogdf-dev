@@ -3,6 +3,17 @@
  * Milan Bradonjic, Aric Hagberg, andAllon G. Percus
  *
  * Geographical-threshold graph
+ * Related text:
+ * The Geographical Threshold Graph model is constructed from of a set of n 
+ * nodes placed independently in R^d  according to a Poisson point-wise
+ * process. A non-negative weight w_i, taken randomly and independently from
+ * a probability distribution function f(w):R+ -> R+, is assigned to each node
+ * v_i for i belong [n]. Let F(x) = integration(0, x)(f(w)) dw be the
+ * cumulative density function. For two nodes i and j at distance r, the
+ * edge (i, j) exists if and only if the following connectivity relation is
+ * satisfied: G(w_i, w_j)h(r) ≥ θ_n, where θ_n is a given threshold parameter
+ * that depends on the size of the network. The function h(r) is assumed to be
+ * decreasing in r. We use h(r) = r^(−α), for some positive α.
  */
 
 #include <iostream>
